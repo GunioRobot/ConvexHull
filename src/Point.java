@@ -1,36 +1,55 @@
 public class Point implements Comparable<Point>
 {
-	private final static int spread = 3;
-	public final double X,
-						Y,
-						len,
-						angle;
+	private final static int spread = 10;
+	public int X,
+			   Y;
 
 	public Point()
 	{
 		java.util.Random r = new java.util.Random();
-		X = (r.nextInt(2*spread+1)-spread) * r.nextDouble(); 
-		Y = (r.nextInt(2*spread+1)-spread) * r.nextDouble();
-		len = Math.sqrt(X*X+Y*Y);
-		angle = (X >= 0 ? (Y >= 0 ? Math.atan(Y/X) : 2*Math.PI+Math.atan(Y/X)) : (Y >= 0 ? Math.PI+Math.atan(Y/X) : Math.PI+Math.atan(Y/X)));
+		X = r.nextInt(2*spread+1)-spread;
+		Y = r.nextInt(2*spread+1)-spread;
 	}
 	
-	public Point(double X, double Y)
+	public Point(int X, int Y)
 	{
 		this.X = X;
 		this.Y = Y;
-		len = Math.sqrt(X*X+Y*Y);
-		angle = (X >= 0 ? (Y >= 0 ? Math.atan(Y/X) : 2*Math.PI+Math.atan(Y/X)) : (Y >= 0 ? Math.PI+Math.atan(Y/X) : Math.PI+Math.atan(Y/X)));
 	}
 
+	public void swap(Point p)
+	{
+		if(!equals(p))
+		{
+			X ^= p.X;
+			p.X ^= X;
+			X ^= p.X;
+
+			Y ^= p.Y;
+			p.Y ^= Y;
+			Y ^= p.Y;
+		}
+	}
+	
+	@Deprecated
+	public int cross(Point p)
+	{
+		return X * p.Y - Y * p.X;
+	}
+	
+	@Deprecated
+	public Point minus(Point p)
+	{
+		return new Point(X - p.X, Y - p.Y);
+	}
+	
 	@Override
 	public int compareTo(Point p)
 	{
-		if(p.X < X)
-			return -1;
-		if(p.X > X)
-			return 1;
-		return 0;
+		if(X == p.X) 
+			return Y - p.Y;
+		else 
+			return X - p.X;
 	}
 	
 	@Override
