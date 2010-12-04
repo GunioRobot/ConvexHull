@@ -15,7 +15,7 @@ import javax.swing.WindowConstants;
 @SuppressWarnings("serial")
 public class Display extends JFrame 
 {
-	private final static int size = 5;
+	private final static int size = 50;
 	
 	private JToggleButton buttonPlayPause;
 	private JButton buttonNew, 
@@ -131,6 +131,16 @@ public class Display extends JFrame
 			buttonPlayPause.setText("Pause");
 		else
 			buttonPlayPause.setText("Play");
+		
+		int h = field.grahamHull(0, field.getPoints().length);
+        Point[] p = field.getPoints();
+        for(int i = 0; i < h; i++)
+        {
+        	if(i == 0)
+        		graph.drawLine(new Line(p[0], p[h-1]));
+        	else
+        		graph.drawLine(new Line(p[i], p[i-1]));
+        }
 	}
 	
 	private void buttonSpeedMinusActionPerformed(ActionEvent evt) 
@@ -140,7 +150,7 @@ public class Display extends JFrame
 			oldSpeed = f == 0f ? oldSpeed : formatSpeed(f - .05f);
 		else
 			oldSpeed = formatSpeed(f.intValue() - 1); 
-		settingSpeed.setText(oldSpeed);	
+		settingSpeed.setText(oldSpeed);
 	}
 	
 	private void buttonSpeedPlusActionPerformed(ActionEvent evt) 
@@ -160,6 +170,10 @@ public class Display extends JFrame
 			float f = new Float(settingSpeed.getText());
 			oldSpeed = (f >= 99.95f || f < 0f) ? oldSpeed : new Float((float)Math.round(f * 10)/10).toString();
 			settingSpeed.setText(oldSpeed);
+			if(oldSpeed.equals("0.0") && buttonPlayPause.getText().equals("Play"))
+				buttonPlayPause.doClick();
+			else if(buttonPlayPause.getText().equals("Pause"))
+				buttonPlayPause.doClick();
 		}
 		catch(NumberFormatException e)
 		{
@@ -177,5 +191,10 @@ public class Display extends JFrame
 	{
 		field = new Field(size);
 		graph.drawPoints(field.getPoints());
+	}
+	
+	public Field getField()
+	{
+		return field;
 	}
 }

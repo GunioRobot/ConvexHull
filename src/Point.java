@@ -1,6 +1,6 @@
 public class Point implements Comparable<Point>
 {
-	private final static int spread = 10;
+	private final static int spread = 50;
 	public int X,
 			   Y;
 
@@ -29,18 +29,6 @@ public class Point implements Comparable<Point>
 			p.Y ^= Y;
 			Y ^= p.Y;
 		}
-	}
-	
-	@Deprecated
-	public int cross(Point p)
-	{
-		return X * p.Y - Y * p.X;
-	}
-	
-	@Deprecated
-	public Point minus(Point p)
-	{
-		return new Point(X - p.X, Y - p.Y);
 	}
 	
 	@Override
