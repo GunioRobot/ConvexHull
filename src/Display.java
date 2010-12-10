@@ -30,7 +30,7 @@ public class Display extends JFrame
 		buttonHull = new JButton("Find...");
 		buttonPointsMinus = new JButton("-");
 		buttonPointsPlus = new JButton("+");
-		numberPoints = new JTextField(new Integer(pointsBackup).toString());
+		numberPoints = new JTextField(pointsBackup.toString());
 		separator = new JSeparator();
 		field = new Field(new Integer(numberPoints.getText()));
 		graph = new Graph(field.getPoints());
