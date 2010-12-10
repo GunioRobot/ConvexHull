@@ -27,7 +27,6 @@ public class Field
 	
 	private void grahamSort(int S, int n, int d)
 	{
-		//Smoothsort.sort(allPoints, S, n);
 		Arrays.sort(allPoints,S,S+n);
 		if(d == -1)
 			for(int left=S, right=S+n-1; left < right; left++, right--) 

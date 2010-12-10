@@ -6,7 +6,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -14,28 +13,26 @@ import javax.swing.WindowConstants;
 
 @SuppressWarnings("serial")
 public class Display extends JFrame 
-{
-	private final static int size = 50;
-	
-	private JToggleButton buttonPlayPause;
-	private JButton buttonNew, 
-					buttonSpeedPlus,
-					buttonSpeedMinus;
-	private JTextField settingSpeed;
+{	
+	private JButton buttonNew,
+					buttonHull,
+					buttonPointsPlus,
+					buttonPointsMinus;
+	private JTextField numberPoints;
+	private Integer pointsBackup = 50;
 	private JSeparator separator;
 	private Graph graph;
-	private String oldSpeed = "1.0";
 	private Field field;
 
 	public Display() 
 	{
-		buttonPlayPause = new JToggleButton("Play", false);
 		buttonNew = new JButton("New");
-		buttonSpeedMinus = new JButton("-");
-		buttonSpeedPlus = new JButton("+");
-		settingSpeed = new JTextField(oldSpeed);
+		buttonHull = new JButton("Find...");
+		buttonPointsMinus = new JButton("-");
+		buttonPointsPlus = new JButton("+");
+		numberPoints = new JTextField(new Integer(pointsBackup).toString());
 		separator = new JSeparator();
-		field = new Field(size);
+		field = new Field(new Integer(numberPoints.getText()));
 		graph = new Graph(field.getPoints());
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -55,28 +52,28 @@ public class Display extends JFrame
 				buttonNewActionPerformed(evt);
 			}
 		});
-		buttonPlayPause.addActionListener(new ActionListener() 
+		buttonHull.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent evt) 
 			{
-				buttonPlayPauseActionPerformed(evt);
+				buttonHullActionPerformed(evt);
 			}
 		});
-		buttonSpeedPlus.addActionListener(new ActionListener() 
+		buttonPointsPlus.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent evt) 
 			{
 				buttonSpeedPlusActionPerformed(evt);
 			}
 		});
-		settingSpeed.addActionListener(new ActionListener() 
+		numberPoints.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent evt) 
 			{
-				settingSpeedActionPerformed(evt);
+				fieldSize();
 			}
 		});
-		buttonSpeedMinus.addActionListener(new ActionListener() 
+		buttonPointsMinus.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent evt) 
 			{
@@ -91,13 +88,13 @@ public class Display extends JFrame
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonNew)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(buttonPlayPause, 70, 70, 70)
+						.addComponent(buttonHull, 70, 70, 70)
 						.addGap(69, 69, 69)
-						.addComponent(buttonSpeedMinus)
+						.addComponent(buttonPointsMinus)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(settingSpeed, 35, 35, 35)
+						.addComponent(numberPoints, 35, 35, 35)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(buttonSpeedPlus)
+						.addComponent(buttonPointsPlus)
 						.addContainerGap(329, Short.MAX_VALUE))
 						.addComponent(separator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
 						.addComponent(graph, GroupLayout.Alignment.TRAILING, 640, 640, 674)
@@ -106,11 +103,11 @@ public class Display extends JFrame
 				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(buttonSpeedMinus, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-								.addComponent(settingSpeed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(buttonSpeedPlus)
+								.addComponent(buttonPointsMinus, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+								.addComponent(numberPoints, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(buttonPointsPlus)
 								.addComponent(buttonNew)
-								.addComponent(buttonPlayPause))
+								.addComponent(buttonHull))
 								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 								.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -122,79 +119,49 @@ public class Display extends JFrame
 
 	private void buttonNewActionPerformed(ActionEvent evt) 
 	{
-		generatePoints();
+		field = new Field(fieldSize());
+		graph.drawPoints(field.getPoints());
 	}
 
-	private void buttonPlayPauseActionPerformed(ActionEvent evt) 
+	private void buttonHullActionPerformed(ActionEvent evt) 
 	{
-		if(buttonPlayPause.getText().equals("Play"))
-			buttonPlayPause.setText("Pause");
-		else
-			buttonPlayPause.setText("Play");
-		
 		int h = field.grahamHull(0, field.getPoints().length);
         Point[] p = field.getPoints();
         for(int i = 0; i < h; i++)
-        {
         	if(i == 0)
         		graph.drawLine(new Line(p[0], p[h-1]));
         	else
         		graph.drawLine(new Line(p[i], p[i-1]));
-        }
 	}
 	
 	private void buttonSpeedMinusActionPerformed(ActionEvent evt) 
-	{
-		Float f = new Float(oldSpeed);
-		if(f <= 1f)
-			oldSpeed = f == 0f ? oldSpeed : formatSpeed(f - .05f);
-		else
-			oldSpeed = formatSpeed(f.intValue() - 1); 
-		settingSpeed.setText(oldSpeed);
+	{ 
+		if(fieldSize() > 3)
+		{
+			pointsBackup--;
+			numberPoints.setText(pointsBackup.toString());
+		}
 	}
 	
 	private void buttonSpeedPlusActionPerformed(ActionEvent evt) 
 	{
-		Float f = new Float(oldSpeed);
-		if(f >= 1f && f < 99f)
-			oldSpeed = formatSpeed(f.intValue() + 1);
-		else
-			oldSpeed = formatSpeed(f + .1f);
-		settingSpeed.setText(oldSpeed);
+		if(fieldSize() < Integer.MAX_VALUE)
+		{
+			pointsBackup++;
+			numberPoints.setText(pointsBackup.toString());
+		}
 	}
-
-	private void settingSpeedActionPerformed(ActionEvent evt) 
+	
+	private int fieldSize()
 	{
 		try
 		{
-			float f = new Float(settingSpeed.getText());
-			oldSpeed = (f >= 99.95f || f < 0f) ? oldSpeed : new Float((float)Math.round(f * 10)/10).toString();
-			settingSpeed.setText(oldSpeed);
-			if(oldSpeed.equals("0.0") && buttonPlayPause.getText().equals("Play"))
-				buttonPlayPause.doClick();
-			else if(buttonPlayPause.getText().equals("Pause"))
-				buttonPlayPause.doClick();
+			pointsBackup = new Integer(numberPoints.getText());
 		}
 		catch(NumberFormatException e)
 		{
-			settingSpeed.setText(oldSpeed);
+			numberPoints.setText(pointsBackup.toString());
 		}
-	}
-	
-	private String formatSpeed(float f)
-	{
-		Float g = f;
-		return g.toString().substring(0, g.toString().indexOf(".")+2);
-	}
-	
-	private void generatePoints()
-	{
-		field = new Field(size);
-		graph.drawPoints(field.getPoints());
-	}
-	
-	public Field getField()
-	{
-		return field;
+		return pointsBackup;
 	}
 }
